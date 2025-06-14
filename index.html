@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepDream AI - 一站式AI创作平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6e44ff;
+            --primary-dark: #5a36d9;
+            --secondary: #ff6b6b;
+            --accent: #1dd1a1;
+            --dark: #2d3436;
+            --light: #f7f9fc;
+            --gray: #636e72;
+            --light-gray: #dfe6e9;
+            --card-bg: #ffffff;
+            --header-bg: rgba(255, 255, 255, 0.95);
+            --transition: all 0.3s ease;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans SC', sans-serif;
+            background-color: #f0f2f5;
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 头部样式 */
+        header {
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logo i {
+            font-size: 28px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 16px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(110, 68, 255, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: rgba(110, 68, 255, 0.1);
+        }
+
+        /* 英雄区域 */
+        .hero {
+            padding: 80px 0 40px;
+            background: linear-gradient(135deg, #f5f7ff 0%, #f0f2f5 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .hero-text {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .hero-text h1 span {
+            color: var(--primary);
+            position: relative;
+        }
+
+        .hero-text h1 span::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 12px;
+            background: rgba(110, 68, 255, 0.2);
+            z-index: -1;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 35px;
+            max-width: 90%;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .hero-image {
+            flex: 1;
+            position: relative;
+        }
+
+        .hero-video-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transform: perspective(1000px) rotateY(-5deg);
+            border: 1px solid var(--light-gray);
+        }
+
+        .video-placeholder {
+            width: 100%;
+            height: 350px;
+            background: linear-gradient(45deg, #6e44ff, #ff6b6b, #1dd1a1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .video-placeholder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-4.0.3&auto=format&fit=crop&w=1050&q=80') center/cover;
+            opacity: 0.8;
+        }
+
+        .video-controls {
+            display: flex;
+            padding: 15px;
+            background: white;
+        }
+
+        .video-controls input {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 30px;
+            border: 1px solid var(--light-gray);
+            font-size: 15px;
+            margin-right: 10px;
+        }
+
+        /* 功能区域 */
+        .features {
+            padding: 100px 0;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid var(--light-gray);
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(110, 68, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 32px;
+            color: var(--primary);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .feature-card p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        /* 视频生成区域 */
+        .video-generator {
+            padding: 100px 0;
+            background: linear-gradient(to bottom, #f8f9ff 0%, #f0f2f5 100%);
+        }
+
+        .video-generator-container {
+            display: flex;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .generator-controls {
+            flex: 1;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--light-gray);
+        }
+
+        .generator-controls h3 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid var(--light-gray);
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+            font-size: 15px;
+            transition: var(--transition);
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(110, 68, 255, 0.2);
+        }
+
+        .form-group .example {
+            color: var(--gray);
+            font-size: 14px;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .param-controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .param-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .param-item label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .param-item select, .param-item input {
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--light-gray);
+            font-family: inherit;
+        }
+
+        .generator-preview {
+            flex: 1;
+            position: relative;
+        }
+
+        .preview-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid var(--light-gray);
+        }
+
+        .preview-header {
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .preview-content {
+            padding: 25px;
+            text-align: center;
+        }
+
+        .video-result {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(45deg, #5a36d9, #1dd1a1);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-result::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-4.0.3&auto=format&fit=crop&w=1050&q=80') center/cover;
+            opacity: 0.7;
+        }
+
+        .preview-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* 定价区域 */
+        .pricing {
+            padding: 100px 0;
+            background: white;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .pricing-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid var(--light-gray);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card.popular {
+            border: 2px solid var(--primary);
+            transform: scale(1.05);
+        }
+
+        .popular-tag {
+            position: absolute;
+            top: 15px;
+            right: -35px;
+            background: var(--primary);
+            color: white;
+            padding: 5px 40px;
+            transform: rotate(45deg);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 25px;
+        }
+
+        .price span {
+            font-size: 1.2rem;
+            color: var(--gray);
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .pricing-features li {
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--light-gray);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+
+        .pricing-features li i {
+            color: var(--accent);
+        }
+
+        /* 社区展示 */
+        .community {
+            padding: 100px 0;
+            background: linear-gradient(to bottom, #f0f2f5 0%, #e6e9ff 100%);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .gallery-item {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            position: relative;
+            height: 250px;
+            background: white;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            transform: translateY(100%);
+            transition: var(--transition);
+        }
+
+        .gallery-item:hover .gallery-info {
+            transform: translateY(0);
+        }
+
+        /* 页脚 */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 70px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #b2bec3;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #b2bec3;
+            font-size: 14px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .hero-content, .video-generator-container {
+                flex-direction: column;
+            }
+            
+            .hero-text, .hero-image {
+                max-width: 100%;
+            }
+            
+            .hero-text h1 {
+                font-size: 2.8rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero-text h1 {
+                font-size: 2.3rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+            }
+            
+            .param-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <span>DeepDream AI</span>
+                </div>
+                <nav class="nav-links">
+                    <a href="#features">功能</a>
+                    <a href="#video">视频生成</a>
+                    <a href="#pricing">定价</a>
+                    <a href="#templates">模板</a>
+                    <a href="#community">社区</a>
+                </nav>
+                <div class="nav-buttons">
+                    <button class="btn btn-outline">登录</button>
+                    <button class="btn btn-primary">免费开始</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>用AI创作 <span>惊艳的视频与图像</span></h1>
+                    <p>DeepDream AI 提供一站式AI创作解决方案，通过动态提示词生成高质量视频和图像，释放你的无限创意。</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary">开始创作</button>
+                        <button class="btn btn-outline">查看演示</button>
+                    </div>
+                    <div class="hero-stats">
+                        <p><i class="fas fa-check-circle" style="color: var(--accent);"></i> 超过 500,000 用户信任</p>
+                        <p><i class="fas fa-bolt" style="color: var(--secondary);"></i> 平均 3 分钟生成 5 秒视频</p>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="hero-video-container">
+                        <div class="video-placeholder">
+                            AI 生成视频预览
+                        </div>
+                        <div class="video-controls">
+                            <input type="text" placeholder="输入提示词，例如：樱花树下穿汉服的少女转身微笑...">
+                            <button class="btn btn-primary">生成</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能区域 -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>强大的AI创作功能</h2>
+                <p>DeepDream AI 提供全方位的AI创作工具，满足您的各种创意需求</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>AI视频生成</h3>
+                    <p>使用动态提示词生成3-5秒高质量视频，支持镜头运动控制和多种风格</p>
+                    <button class="btn btn-outline">了解更多</button>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <h3>AI图像创作</h3>
+                    <p>文生图/图生图功能，支持16种艺术风格，最高8K分辨率输出</p>
+                    <button class="btn btn-outline">了解更多</button>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h3>故事创作模式</h3>
+                    <p>分镜剧本一键转视频序列，智能生成角色口型同步动画</p>
+                    <button class="btn btn-outline">了解更多</button>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>创意社区</h3>
+                    <p>分享模板、获取灵感，一键复用他人成功创作方案</p>
+                    <button class="btn btn-outline">了解更多</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 视频生成区域 -->
+    <section class="video-generator" id="video">
+        <div class="container">
+            <div class="section-title">
+                <h2>动态提示词视频生成</h2>
+                <p>通过结构化描述公式创建惊艳的AI视频</p>
+            </div>
+            <div class="video-generator-container">
+                <div class="generator-controls">
+                    <h3>创建您的AI视频</h3>
+                    <div class="form-group">
+                        <label for="prompt">动态提示词</label>
+                        <textarea id="prompt" placeholder="[主体]+[动作]+[场景细节]+[镜头指令]&#10;例如：白衣少女（主体）在雨中奔跑（动作），雨滴飞溅（细节），镜头从近景拉至全景（镜头）"></textarea>
+                        <span class="example">使用结构化描述公式获得最佳效果</span>
+                    </div>
+                    <div class="param-controls">
+                        <div class="param-item">
+                            <label for="style">视频风格</label>
+                            <select id="style">
+                                <option>电影感</option>
+                                <option>动漫风格</option>
+                                <option>3D渲染</option>
+                                <option>写实风格</option>
+                                <option>油画质感</option>
+                            </select>
+                        </div>
+                        <div class="param-item">
+                            <label for="duration">视频时长</label>
+                            <select id="duration">
+                                <option>3秒</option>
+                                <option>5秒</option>
+                                <option>8秒</option>
+                                <option>10秒</option>
+                            </select>
+                        </div>
+                        <div class="param-item">
+                            <label for="motion">镜头运动</label>
+                            <select id="motion">
+                                <option>推近</option>
+                                <option>拉远</option>
+                                <option>左平移</option>
+                                <option>右平移</option>
+                                <option>环绕</option>
+                            </select>
+                        </div>
+                        <div class="param-item">
+                            <label for="speed">运动速度</label>
+                            <select id="speed">
+                                <option>慢速</option>
+                                <option>中速</option>
+                                <option>快速</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 15px;">
+                        生成视频 (消耗 15 积分)
+                    </button>
+                </div>
+                <div class="generator-preview">
+                    <div class="preview-card">
+                        <div class="preview-header">
+                            <i class="fas fa-play-circle"></i>
+                            视频预览
+                        </div>
+                        <div class="preview-content">
+                            <div class="video-result">
+                                视频生成预览区域
+                            </div>
+                            <p>提示词：白衣少女在雨中奔跑，镜头从近景拉至全景</p>
+                            <div class="preview-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value">3s</div>
+                                    <div class="stat-label">时长</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">1080p</div>
+                                    <div class="stat-label">分辨率</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">45帧</div>
+                                    <div class="stat-label">流畅度</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 定价区域 -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-title">
+                <h2>简单透明的定价</h2>
+                <p>选择适合您的计划，开启AI创作之旅</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>免费版</h3>
+                    <div class="price">¥0 <span>/月</span></div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> 每日60积分</li>
+                        <li><i class="fas fa-check"></i> 4张图片/天</li>
+                        <li><i class="fas fa-check"></i> 3秒视频/天</li>
+                        <li><i class="fas fa-check"></i> 720p分辨率</li>
+                        <li><i class="fas fa-times"></i> 无高级风格</li>
+                    </ul>
+                    <button class="btn btn-outline">开始使用</button>
+                </div>
+                <div class="pricing-card popular">
+                    <div class="popular-tag">推荐</div>
+                    <h3>专业版</h3>
+                    <div class="price">¥79 <span>/月</span></div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> 2000积分/月</li>
+                        <li><i class="fas fa-check"></i> 无限图片生成</li>
+                        <li><i class="fas fa-check"></i> 最长10秒视频</li>
+                        <li><i class="fas fa-check"></i> 1080p分辨率</li>
+                        <li><i class="fas fa-check"></i> 所有视频风格</li>
+                    </ul>
+                    <button class="btn btn-primary">立即订阅</button>
+                </div>
+                <div class="pricing-card">
+                    <h3>企业版</h3>
+                    <div class="price">¥239 <span>/月</span></div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> 无限积分</li>
+                        <li><i class="fas fa-check"></i> 4K超清输出</li>
+                        <li><i class="fas fa-check"></i> 商业使用权</li>
+                        <li><i class="fas fa-check"></i> 优先渲染队列</li>
+                        <li><i class="fas fa-check"></i> 专属技术支持</li>
+                    </ul>
+                    <button class="btn btn-outline">联系销售</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 社区展示 -->
+    <section class="community" id="community">
+        <div class="container">
+            <div class="section-title">
+                <h2>社区创作精选</h2>
+                <p>探索其他用户使用DeepDream AI创作的精彩作品</p>
+            </div>
+            <div class="gallery">
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1682687220063-4742bd7fd538?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="AI作品">
+                    <div class="gallery-info">
+                        <h4>星空下的舞者</h4>
+                        <p>提示词：芭蕾舞者在银河下起舞，镜头环绕</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1682687220199-3e2183fd8d14?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="AI作品">
+                    <div class="gallery-info">
+                        <h4>未来城市</h4>
+                        <p>提示词：赛博朋克风格未来都市，镜头推近</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1682687220509-61b8a906ca19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="AI作品">
+                    <div class="gallery-info">
+                        <h4>森林精灵</h4>
+                        <p>提示词：发光精灵在魔法森林中飞翔，镜头跟随</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1682687220777-2c60708d6887?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="AI作品">
+                    <div class="gallery-info">
+                        <h4>海底世界</h4>
+                        <p>提示词：珊瑚礁中的热带鱼群，镜头缓慢平移</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>DeepDream AI</h3>
+                    <p style="color: #b2bec3; margin-top: 20px;">一站式AI创作平台，让创意无限延伸</p>
+                    <div style="display: flex; gap: 15px; margin-top: 20px;">
+                        <a href="#" style="color: white; font-size: 20px;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" style="color: white; font-size: 20px;"><i class="fab fa-facebook"></i></a>
+                        <a href="#" style="color: white; font-size: 20px;"><i class="fab fa-instagram"></i></a>
+                        <a href="#" style="color: white; font-size: 20px;"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>产品</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">AI视频生成</a></li>
+                        <li><a href="#">AI图像创作</a></li>
+                        <li><a href="#">故事编辑器</a></li>
+                        <li><a href="#">动态海报</a></li>
+                        <li><a href="#">API接口</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>资源</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">提示词指南</a></li>
+                        <li><a href="#">视频教程</a></li>
+                        <li><a href="#">创意社区</a></li>
+                        <li><a href="#">模板库</a></li>
+                        <li><a href="#">博客</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>支持</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">帮助中心</a></li>
+                        <li><a href="#">联系支持</a></li>
+                        <li><a href="#">系统状态</a></li>
+                        <li><a href="#">使用条款</a></li>
+                        <li><a href="#">隐私政策</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2023 DeepDream AI. 保留所有权利。
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 简单的交互效果
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为所有按钮添加悬停效果
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                });
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // 功能卡片悬停效果
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.querySelector('.feature-icon').style.transform = 'rotate(10deg) scale(1.1)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.querySelector('.feature-icon').style.transform = 'rotate(0) scale(1)';
+                });
+            });
+            
+            // 简单的动画效果
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            // 观察需要动画的元素
+            document.querySelectorAll('.hero-text, .hero-image, .feature-card, .generator-controls, .generator-preview, .pricing-card, .gallery-item').forEach(el => {
+                el.style.opacity = 0;
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+            
+            // 表单提交功能
+            const generateBtn = document.querySelector('.generator-controls .btn-primary');
+            const promptTextarea = document.getElementById('prompt');
+            
+            generateBtn.addEventListener('click', function() {
+                if (promptTextarea.value.trim() === '') {
+                    promptTextarea.style.borderColor = 'var(--secondary)';
+                    promptTextarea.style.boxShadow = '0 0 0 3px rgba(255, 107, 107, 0.2)';
+                    alert('请输入动态提示词');
+                    return;
+                }
+                
+                // 模拟生成过程
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    this.innerHTML = '生成视频 (消耗 15 积分)';
+                    this.disabled = false;
+                    
+                    // 更新预览区域
+                    const previewArea = document.querySelector('.video-result');
+                    previewArea.innerHTML = '视频生成成功！<div style="margin-top:15px;font-size:14px">点击播放按钮查看</div>';
+                    
+                    // 添加播放按钮
+                    const playBtn = document.createElement('button');
+                    playBtn.className = 'btn btn-primary';
+                    playBtn.style.marginTop = '15px';
+                    playBtn.innerHTML = '<i class="fas fa-play"></i> 播放视频';
+                    previewArea.appendChild(playBtn);
+                    
+                    alert('视频生成成功！');
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>
