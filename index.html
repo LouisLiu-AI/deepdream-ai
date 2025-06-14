@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeepDream AI - 一站式AI创作平台</title>
+    <title>DeepDream AI - AI视频生成平台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -122,6 +122,9 @@
             transition: var(--transition);
             border: none;
             outline: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-primary {
@@ -225,6 +228,7 @@
             font-size: 24px;
             font-weight: 600;
             position: relative;
+            overflow: hidden;
         }
 
         .video-placeholder::before {
@@ -441,28 +445,48 @@
         .video-result {
             width: 100%;
             height: 250px;
-            background: linear-gradient(45deg, #5a36d9, #1dd1a1);
+            background: #f0f2f5;
             border-radius: 15px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: var(--gray);
             font-size: 18px;
             font-weight: 600;
             position: relative;
             overflow: hidden;
+            flex-direction: column;
         }
 
-        .video-result::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-4.0.3&auto=format&fit=crop&w=1050&q=80') center/cover;
-            opacity: 0.7;
+        .video-player {
+            width: 100%;
+            height: 100%;
+            background: black;
+            display: none;
+        }
+
+        .video-player video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .progress-container {
+            width: 80%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-top: 20px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
         }
 
         .preview-stats {
@@ -484,6 +508,55 @@
         .stat-label {
             font-size: 14px;
             color: var(--gray);
+        }
+
+        .video-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+            display: none;
+        }
+
+        /* 历史记录 */
+        .history-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+
+        .history-panel h4 {
+            margin-bottom: 15px;
+            color: var(--dark);
+            font-size: 1.2rem;
+        }
+
+        .history-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 10px;
+            background: #f9f9f9;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .history-item:hover {
+            background: #f0f0f0;
+        }
+
+        .history-item i {
+            color: var(--primary);
+            margin-right: 10px;
         }
 
         /* 定价区域 */
@@ -865,9 +938,16 @@
                             </select>
                         </div>
                     </div>
-                    <button class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 15px;">
-                        生成视频 (消耗 15 积分)
+                    <button class="btn btn-primary generate-btn" style="width: 100%; margin-top: 20px; padding: 15px;">
+                        <i class="fas fa-play-circle"></i> 生成视频 (消耗 15 积分)
                     </button>
+                    
+                    <div class="history-panel" id="historyPanel">
+                        <h4><i class="fas fa-history"></i> 历史记录</h4>
+                        <div class="history-items" id="historyItems">
+                            <!-- 历史记录将通过JS动态生成 -->
+                        </div>
+                    </div>
                 </div>
                 <div class="generator-preview">
                     <div class="preview-card">
@@ -876,21 +956,42 @@
                             视频预览
                         </div>
                         <div class="preview-content">
-                            <div class="video-result">
-                                视频生成预览区域
+                            <div class="video-result" id="videoResult">
+                                <i class="fas fa-video" style="font-size: 40px; margin-bottom: 15px;"></i>
+                                等待生成视频
+                                <div class="progress-container" id="progressContainer">
+                                    <div class="progress-bar" id="progressBar"></div>
+                                </div>
                             </div>
-                            <p>提示词：白衣少女在雨中奔跑，镜头从近景拉至全景</p>
+                            <div class="video-player" id="videoPlayer">
+                                <video id="generatedVideo" controls>
+                                    <source src="" type="video/mp4">
+                                    您的浏览器不支持视频播放。
+                                </video>
+                            </div>
+                            <p id="promptText">提示词：请在上方输入提示词</p>
+                            <div class="video-actions" id="videoActions">
+                                <button class="btn btn-outline">
+                                    <i class="fas fa-redo"></i> 重新生成
+                                </button>
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-download"></i> 下载视频
+                                </button>
+                                <button class="btn btn-outline">
+                                    <i class="fas fa-share-alt"></i> 分享
+                                </button>
+                            </div>
                             <div class="preview-stats">
                                 <div class="stat-item">
-                                    <div class="stat-value">3s</div>
+                                    <div class="stat-value">0s</div>
                                     <div class="stat-label">时长</div>
                                 </div>
                                 <div class="stat-item">
-                                    <div class="stat-value">1080p</div>
+                                    <div class="stat-value">0p</div>
                                     <div class="stat-label">分辨率</div>
                                 </div>
                                 <div class="stat-item">
-                                    <div class="stat-value">45帧</div>
+                                    <div class="stat-value">0帧</div>
                                     <div class="stat-label">流畅度</div>
                                 </div>
                             </div>
@@ -1042,6 +1143,34 @@
     </footer>
 
     <script>
+        // 视频示例库
+        const videoLibrary = {
+            "白衣少女在雨中奔跑": {
+                url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                duration: "3s",
+                resolution: "1080p",
+                fps: "45帧"
+            },
+            "樱花树下穿汉服的少女转身微笑": {
+                url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+                duration: "5s",
+                resolution: "1080p",
+                fps: "60帧"
+            },
+            "未来城市飞行之旅": {
+                url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+                duration: "8s",
+                resolution: "4K",
+                fps: "60帧"
+            },
+            "森林中的魔法生物": {
+                url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+                duration: "6s",
+                resolution: "1080p",
+                fps: "50帧"
+            }
+        };
+
         // 简单的交互效果
         document.addEventListener('DOMContentLoaded', function() {
             // 为所有按钮添加悬停效果
@@ -1084,39 +1213,174 @@
                 observer.observe(el);
             });
             
-            // 表单提交功能
-            const generateBtn = document.querySelector('.generator-controls .btn-primary');
+            // 视频生成功能
+            const generateBtn = document.querySelector('.generate-btn');
             const promptTextarea = document.getElementById('prompt');
+            const videoResult = document.getElementById('videoResult');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const generatedVideo = document.getElementById('generatedVideo');
+            const videoActions = document.getElementById('videoActions');
+            const promptText = document.getElementById('promptText');
+            const historyPanel = document.getElementById('historyPanel');
+            const historyItems = document.getElementById('historyItems');
+            const styleSelect = document.getElementById('style');
+            const durationSelect = document.getElementById('duration');
             
+            // 历史记录数组
+            let history = [];
+            
+            // 加载历史记录
+            loadHistory();
+            
+            // 生成视频函数
             generateBtn.addEventListener('click', function() {
-                if (promptTextarea.value.trim() === '') {
+                const prompt = promptTextarea.value.trim();
+                const style = styleSelect.value;
+                const duration = durationSelect.value;
+                
+                if (!prompt) {
                     promptTextarea.style.borderColor = 'var(--secondary)';
                     promptTextarea.style.boxShadow = '0 0 0 3px rgba(255, 107, 107, 0.2)';
                     alert('请输入动态提示词');
                     return;
                 }
                 
-                // 模拟生成过程
+                // 更新按钮状态
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
                 this.disabled = true;
                 
+                // 显示进度条
+                videoResult.innerHTML = '<i class="fas fa-cog fa-spin" style="font-size: 40px; margin-bottom: 15px;"></i>AI正在生成您的视频...';
+                progressContainer.style.display = 'block';
+                
+                // 模拟生成进度
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += Math.floor(Math.random() * 10);
+                    if (progress >= 100) {
+                        clearInterval(progressInterval);
+                        finishVideoGeneration(prompt, style, duration);
+                    } else {
+                        progressBar.style.width = progress + '%';
+                    }
+                }, 200);
+            });
+            
+            // 完成视频生成
+            function finishVideoGeneration(prompt, style, duration) {
+                // 重置按钮
+                generateBtn.innerHTML = '<i class="fas fa-play-circle"></i> 生成视频 (消耗 15 积分)';
+                generateBtn.disabled = false;
+                
+                // 隐藏进度条
+                progressContainer.style.display = 'none';
+                progressBar.style.width = '0%';
+                
+                // 确定使用哪个视频
+                let videoKey = Object.keys(videoLibrary)[0]; // 默认第一个
+                
+                // 尝试根据提示词匹配
+                for (const key in videoLibrary) {
+                    if (prompt.includes(key)) {
+                        videoKey = key;
+                        break;
+                    }
+                }
+                
+                const videoData = videoLibrary[videoKey];
+                
+                // 更新UI
+                videoResult.style.display = 'none';
+                videoPlayer.style.display = 'block';
+                videoActions.style.display = 'flex';
+                generatedVideo.src = videoData.url;
+                promptText.textContent = `提示词：${prompt} (${style}, ${duration})`;
+                
+                // 更新统计信息
+                const stats = document.querySelectorAll('.stat-value');
+                stats[0].textContent = duration;
+                stats[1].textContent = videoData.resolution;
+                stats[2].textContent = videoData.fps;
+                
+                // 添加到历史记录
+                addToHistory(prompt, style, duration);
+                
+                // 播放视频
                 setTimeout(() => {
-                    this.innerHTML = '生成视频 (消耗 15 积分)';
-                    this.disabled = false;
+                    generatedVideo.play();
+                }, 500);
+            }
+            
+            // 添加到历史记录
+            function addToHistory(prompt, style, duration) {
+                // 添加到数组开头
+                history.unshift({
+                    prompt,
+                    style,
+                    duration,
+                    timestamp: new Date().toLocaleString()
+                });
+                
+                // 最多保留5条
+                if (history.length > 5) {
+                    history.pop();
+                }
+                
+                // 保存到本地存储
+                saveHistory();
+                
+                // 更新UI
+                renderHistory();
+            }
+            
+            // 渲染历史记录
+            function renderHistory() {
+                historyItems.innerHTML = '';
+                
+                history.forEach((item, index) => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <i class="fas fa-history"></i>
+                        <div>
+                            <div>${item.prompt.substring(0, 30)}${item.prompt.length > 30 ? '...' : ''}</div>
+                            <small>${item.timestamp} | ${item.style} | ${item.duration}</small>
+                        </div>
+                    `;
                     
-                    // 更新预览区域
-                    const previewArea = document.querySelector('.video-result');
-                    previewArea.innerHTML = '视频生成成功！<div style="margin-top:15px;font-size:14px">点击播放按钮查看</div>';
+                    // 点击历史记录填充表单
+                    historyItem.addEventListener('click', () => {
+                        promptTextarea.value = item.prompt;
+                        styleSelect.value = item.style;
+                        durationSelect.value = item.duration;
+                    });
                     
-                    // 添加播放按钮
-                    const playBtn = document.createElement('button');
-                    playBtn.className = 'btn btn-primary';
-                    playBtn.style.marginTop = '15px';
-                    playBtn.innerHTML = '<i class="fas fa-play"></i> 播放视频';
-                    previewArea.appendChild(playBtn);
-                    
-                    alert('视频生成成功！');
-                }, 3000);
+                    historyItems.appendChild(historyItem);
+                });
+                
+                // 显示历史记录面板
+                historyPanel.style.display = 'block';
+            }
+            
+            // 保存历史记录到本地存储
+            function saveHistory() {
+                localStorage.setItem('videoHistory', JSON.stringify(history));
+            }
+            
+            // 从本地存储加载历史记录
+            function loadHistory() {
+                const savedHistory = localStorage.getItem('videoHistory');
+                if (savedHistory) {
+                    history = JSON.parse(savedHistory);
+                    renderHistory();
+                }
+            }
+            
+            // 初始化视频播放器
+            generatedVideo.addEventListener('loadedmetadata', function() {
+                // 可以在这里获取视频实际时长等信息
             });
         });
     </script>
